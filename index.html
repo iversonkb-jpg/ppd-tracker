@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PPD Digitalization — Master KM / Master Infra / Local Infra Dashboard</title>
+<style>
+:root{
+  --sidebar:#f6f3d8; --ink:#1f2937; --muted:#6b7280; --line:#d7dbe0;
+  --blue:#1d4ed8; --blue-soft:#eaf0ff; --panel:#ffffff; --bg:#eef1f5;
+  --green:#22a558; --green-soft:#d8f2e2;
+  --amber:#f59e0b; --amber-soft:#fdeecb;
+  --orange:#f97316; --orange-soft:#ffe4cf;
+  --red:#e0393e; --red-soft:#fbdadb;
+  --grey:#9ca3af; --grey-soft:#e5e7eb;
+  --appeal:#2563eb;
+  --radius:10px; --shadow:0 1px 3px rgba(16,24,40,.08),0 1px 2px rgba(16,24,40,.04);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:13px}
+button{font-family:inherit;cursor:pointer}
+.app{display:flex;min-height:100vh}
+
+/* ---------- SIDEBAR ---------- */
+.sidebar{width:210px;flex:0 0 210px;background:var(--sidebar);border-right:1px solid #e4e0bf;padding:0;position:relative}
+.side-vert{writing-mode:vertical-rl;transform:rotate(180deg);position:absolute;left:6px;top:50%;translate:0 -50%;font-weight:700;letter-spacing:.06em;font-size:11px;color:#5b5b3a}
+.side-inner{margin-left:26px;padding:14px 12px 20px 4px}
+.brand{font-weight:800;font-size:12px;line-height:1.25;color:#20303f}
+.brand small{display:block;font-weight:600;color:#5b5b3a;font-size:10px;margin-top:2px}
+.nav-group{margin-top:14px}
+.nav-label{font-size:10px;font-weight:700;color:#7a7a52;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.nav-tree{background:#fff;border:1px solid #e4e0bf;border-radius:8px;overflow:hidden}
+.tree-item{padding:6px 10px;border-bottom:1px solid #f0eeda;font-size:12px;display:flex;align-items:center;gap:6px;cursor:pointer}
+.tree-item:last-child{border-bottom:none}
+.tree-item .caret{color:#9a9a6a;font-size:10px;width:10px}
+.tree-item.lvl2{padding-left:22px;color:#374151}
+.tree-item.lvl3{padding-left:34px;color:#4b5563;font-size:11.5px}
+.tree-item.active{background:var(--blue-soft);color:var(--blue);font-weight:600}
+.tree-item:hover{background:#faf9ee}
+.access-note{margin-top:14px;font-size:10.5px;color:#8a6d3b;background:#fff7e6;border:1px solid #f3e2b8;border-radius:8px;padding:8px}
+
+/* ---------- MAIN ---------- */
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{background:#fff;border-bottom:1px solid var(--line);padding:8px 16px;display:flex;align-items:center;gap:14px}
+.op-pill{font-size:10px;font-weight:700;color:#374151;background:#eef2f7;border:1px solid #dbe1e8;border-radius:20px;padding:4px 10px}
+.top-meta{margin-left:auto;font-size:11px;color:var(--muted);display:flex;gap:16px;align-items:center}
+.avatar{width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700}
+
+/* tabs */
+.tabs-wrap{background:#fff;border-bottom:1px solid var(--line);padding:6px 12px 0}
+.tab-row{display:flex;gap:3px;flex-wrap:wrap}
+.tab-row.secondary{margin-top:4px;padding-bottom:6px}
+.tab{font-size:11px;font-weight:600;color:#4b5563;background:#f3f5f8;border:1px solid #e3e7ec;border-bottom:none;border-radius:7px 7px 0 0;padding:7px 11px;white-space:nowrap}
+.tab.flat{border-radius:7px;border-bottom:1px solid #e3e7ec}
+.tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.tab.dim{opacity:.55}
+.tab-row.secondary .tab{background:#eef4ff;border-color:#d7e3ff;color:#28457f}
+.tab-row.secondary .tab.active{background:var(--blue);color:#fff}
+
+/* content */
+.content{padding:16px;flex:1}
+.crumbs{font-size:11px;color:var(--muted);margin-bottom:10px}
+.crumbs b{color:var(--ink)}
+
+/* dashboard header */
+.dash-head{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.dash-title h1{margin:0;font-size:22px;letter-spacing:.01em}
+.dash-title .proj{font-size:13px;color:var(--blue);font-weight:600}
+.dash-title .sub{font-size:11px;color:var(--muted);margin-top:2px}
+.countdown{margin-left:auto;background:linear-gradient(135deg,#22b0e6,#1d84d6);color:#fff;border-radius:12px;padding:10px 16px;text-align:center;box-shadow:var(--shadow);min-width:120px}
+.countdown .n{font-size:26px;font-weight:800;line-height:1}
+.countdown .l{font-size:10px;letter-spacing:.08em;opacity:.9;margin-top:3px}
+.countdown.warn{background:linear-gradient(135deg,#f7a13b,#e0393e)}
+
+/* cards row */
+.grid{display:grid;gap:14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow)}
+.card .k{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.card .v{font-size:24px;font-weight:800;margin-top:4px}
+.card .v small{font-size:12px;color:var(--muted);font-weight:600}
+.card.g .v{color:var(--green)} .card.o .v{color:var(--orange)} .card.r .v{color:var(--red)} .card.d .v{color:var(--grey)}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:14px}
+.panel-h{padding:11px 15px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.panel-h h2{margin:0;font-size:13px;font-weight:700}
+.panel-h .hint{font-size:10.5px;color:var(--muted);font-weight:400}
+.panel-b{padding:15px}
+
+/* gauges */
+.gauges{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.gauge{text-align:center}
+.gauge svg{display:block;margin:0 auto}
+.gauge .cap{font-size:11.5px;font-weight:700;margin-top:2px}
+.gauge .pct{font-size:11px;color:var(--muted)}
+
+/* timeline */
+.tl-scroll{overflow-x:auto;padding:6px 4px 16px}
+.timeline{display:flex;align-items:flex-start;min-width:760px;position:relative;padding-top:6px}
+.tl-node{flex:1;min-width:96px;text-align:center;position:relative}
+.tl-node:not(:last-child)::after{content:"";position:absolute;top:20px;left:50%;width:100%;height:3px;background:var(--grey-soft);z-index:0}
+.tl-node.done:not(:last-child)::after{background:var(--green)}
+.tl-dot{width:40px;height:40px;border-radius:50%;margin:0 auto;display:grid;place-items:center;font-weight:700;color:#fff;position:relative;z-index:1;border:3px solid #fff;box-shadow:0 0 0 1px var(--line);cursor:pointer;transition:transform .1s}
+.tl-dot:hover{transform:scale(1.08)}
+.tl-dot.sel{box-shadow:0 0 0 3px var(--blue)}
+.st-green{background:var(--green)} .st-amber{background:var(--amber)} .st-orange{background:var(--orange)}
+.st-red{background:var(--red)} .st-grey{background:var(--grey)} .st-appeal{background:var(--appeal)}
+.tl-label{font-size:10.5px;margin-top:7px;color:#374151;line-height:1.25;padding:0 4px}
+.tl-date{font-size:9.5px;color:var(--muted);margin-top:3px}
+
+/* legend */
+.legend{display:flex;flex-wrap:wrap;gap:14px;padding:10px 15px;font-size:11px;color:#374151;align-items:center}
+.legend .dot{width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:-1px}
+
+/* drill-in */
+.drill{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}
+@media(max-width:900px){.drill{grid-template-columns:1fr}}
+.steps li{margin-bottom:9px;padding-left:4px;line-height:1.4}
+.steps{margin:0;padding-left:18px}
+.step-tag{font-size:9.5px;font-weight:700;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:1px}
+.tag-auto{background:#e6f0ff;color:#1d4ed8}.tag-ppd{background:#e9f7ee;color:#1a7a3f}
+.tag-con{background:#fef3e2;color:#b26a08}.tag-sm{background:#f3e8ff;color:#7c3aed}
+
+/* dept grid */
+.dept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:8px}
+.dept{border-radius:7px;padding:8px 4px;text-align:center;font-size:10.5px;font-weight:700;color:#fff;position:relative;cursor:default}
+.dept small{display:block;font-weight:500;font-size:8.5px;opacity:.95;margin-top:2px}
+.dept.st-grey{color:#4b5563}
+.subtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.subtab{font-size:11px;font-weight:600;padding:6px 12px;border-radius:20px;border:1px solid var(--line);background:#fff;color:#4b5563}
+.subtab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.doc-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed #e5e7eb;font-size:12px}
+.doc-row:last-child{border-bottom:none}
+.chk{width:16px;height:16px;border-radius:4px;display:grid;place-items:center;color:#fff;font-size:10px;flex:0 0 16px}
+.pill{font-size:9.5px;font-weight:700;border-radius:20px;padding:2px 8px;margin-left:auto}
+.pill.green{background:var(--green-soft);color:#146c39}
+.pill.amber{background:var(--amber-soft);color:#8a5a06}
+.pill.grey{background:var(--grey-soft);color:#4b5563}
+.pill.red{background:var(--red-soft);color:#a11f24}
+.muted{color:var(--muted)}
+.info{font-size:11px;color:var(--muted);background:#f8fafc;border:1px solid #eef2f6;border-radius:8px;padding:9px 11px;margin-top:10px}
+.hidden{display:none}
+.ping{margin-left:8px;font-size:10px;font-weight:700;color:#fff;background:var(--orange);border:none;border-radius:6px;padding:4px 9px}
+.footer-note{font-size:10px;color:var(--muted);text-align:center;padding:14px}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="side-vert">OPERATION (HOD, SM &amp; BELOW)</div>
+    <div class="side-inner">
+      <div class="brand">PROJECT PLANNING &amp; DEVELOPMENT<small>PPD Digitalization</small></div>
+
+      <div class="nav-group">
+        <div class="nav-label">Region &gt; BU &gt; Project</div>
+        <div class="nav-tree">
+          <div class="tree-item"><span class="caret">▾</span> Central</div>
+          <div class="tree-item lvl2"><span class="caret">▾</span> Eco World (Live)</div>
+          <div class="tree-item lvl3 active">Eco Grandeur</div>
+          <div class="tree-item lvl3">Eco Ardence</div>
+          <div class="tree-item lvl3">Eco Sanctuary</div>
+          <div class="tree-item"><span class="caret">▸</span> North</div>
+          <div class="tree-item"><span class="caret">▸</span> South</div>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">Projects — Eco Grandeur</div>
+        <div class="nav-tree" id="projTree"></div>
+      </div>
+
+      <div class="access-note"><b>Access Limit (Preset):</b> Respective PPD-PIC can only see their own BU and involved projects.</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <span class="op-pill">OPERATION · HOD, SM &amp; BELOW</span>
+      <div class="top-meta">
+        <span>Updated: <b id="updDate">—</b></span>
+        <span class="avatar">KB</span>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs-wrap">
+      <div class="tab-row">
+        <div class="tab dim">Market Study</div>
+        <div class="tab dim">Land Planning</div>
+        <div class="tab dim">Master Program</div>
+        <div class="tab dim">Product Planning</div>
+        <div class="tab dim">Authorities</div>
+        <div class="tab dim">Tender / CCC VP</div>
+        <div class="tab dim">Consultants Mgmt</div>
+        <div class="tab dim">Data Storage / Library Hub</div>
+      </div>
+      <div class="tab-row secondary" id="subTabs">
+        <div class="tab flat" data-dash="mkm">Master KM (MKM)</div>
+        <div class="tab flat dim">Master Land Matters</div>
+        <div class="tab flat" data-dash="minfra">Master Infra</div>
+        <div class="tab flat dim">Land Matters (QT &amp; FT)</div>
+        <div class="tab flat dim">KM/BP · AKM/ABP</div>
+        <div class="tab flat" data-dash="linfra">Local Infra</div>
+        <div class="tab flat dim">CPSP &amp; Strata VP</div>
+        <div class="tab flat dim">Bumi Release</div>
+        <div class="tab flat dim">Submission Fee Tracking</div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+      <div class="crumbs">Central › Eco World › <b>Eco Grandeur</b> › <b id="crumbProj">Utopia South</b> › <b id="crumbDash">Master KM</b></div>
+
+      <div class="dash-head">
+        <div class="dash-title">
+          <h1 id="dashName">Master KM</h1>
+          <div class="proj" id="dashProj">ECO GRANDEUR · Utopia South</div>
+          <div class="sub" id="dashSub"></div>
+        </div>
+        <div class="countdown" id="countdown">
+          <div class="n" id="cdN">—</div>
+          <div class="l">DAYS TO AP TARGET</div>
+        </div>
+      </div>
+
+      <!-- KPI cards -->
+      <div class="cards" id="kpis"></div>
+
+      <!-- gauges -->
+      <div class="panel">
+        <div class="panel-h"><h2>Milestone Progress</h2><span class="hint">segments = completed / total milestones per stream</span></div>
+        <div class="panel-b"><div class="gauges" id="gauges"></div></div>
+      </div>
+
+      <!-- timeline -->
+      <div class="panel">
+        <div class="panel-h">
+          <h2 id="tlTitle">Submission Tracking — Dot Dashboard</h2>
+          <span class="hint">click any dot to drill into that milestone</span>
+        </div>
+        <div class="tl-scroll"><div class="timeline" id="timeline"></div></div>
+        <div class="legend">
+          <span><span class="dot st-green"></span>Completed</span>
+          <span><span class="dot st-amber"></span>In progress / Ulasan</span>
+          <span><span class="dot st-orange"></span>Submitted &amp; pending</span>
+          <span><span class="dot st-red"></span>Delayed / Overdue</span>
+          <span><span class="dot st-grey"></span>Not started (default)</span>
+          <span><span class="dot st-appeal"></span>Appeal case</span>
+        </div>
+      </div>
+
+      <!-- drill-in -->
+      <div class="panel" id="drillPanel">
+        <div class="panel-h">
+          <h2 id="drillTitle">Milestone detail</h2>
+          <span class="hint" id="drillHint"></span>
+        </div>
+        <div class="panel-b">
+          <div class="drill">
+            <div>
+              <div id="drillSteps"></div>
+            </div>
+            <div>
+              <div id="drillSide"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-note">Prototype · sample data for demo. UIUX concept per PPD KM/BP Works Flow. Status auto-pings consultant every 3 days; PPD may ping manually.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ SAMPLE DATA MODEL ============ */
+const AP_TARGET = new Date('2027-09-05');
+const TODAY = new Date('2026-08-01');
+function daysLeft(){return Math.round((AP_TARGET-TODAY)/86400000);}
+
+const projects = ["Utopia East","Esplanad Square","Utopia South","Wellington Garden Home",
+  "Wellington Terrace Home","Norton Garden Home","Norton Courtyard Home","Sterling West"];
+let currentProj = "Utopia South";
+
+const S = {green:"st-green",amber:"st-amber",orange:"st-orange",red:"st-red",grey:"st-grey",appeal:"st-appeal"};
+const statusLabel = {"st-green":"Completed","st-amber":"In progress / Ulasan","st-orange":"Submitted & pending",
+  "st-red":"Delayed / Overdue","st-grey":"Not started","st-appeal":"Appeal case"};
+
+/* ---- MASTER KM ---- */
+const MKM = {
+  name:"Master KM", title:"Master KM (Kebenaran Merancang) Submission Tracking",
+  sub:"Pre-SPA masterplan → Master KM approval · pre-set duration auto-generates the timeline",
+  gauges:[
+    {cap:"Master Planning",done:9,total:11},
+    {cap:"Pre-Consultation",done:5,total:6},
+    {cap:"KM Submission",done:3,total:8},
+    {cap:"Authority Clearance",done:4,total:10}
+  ],
+  milestones:[
+    {n:1,label:"Setup & Access Limit",st:S.green,date:"12 Jan 26",
+      steps:[["PPD-HOD to set boundary, traits &amp; consultants; system auto-generates timeline from pre-set duration","auto"],
+        ["Timeline baseline (R0) locked; only HOD+ may edit","ppd"],
+        ["System notifies consultants, CA, PI on the timeline","auto"]]},
+    {n:2,label:"Pre-Consultation & Upload Doc",st:S.green,date:"05 Mar 26",
+      steps:[["Consultant makes pre-consultation appointment &amp; uploads comments","con"],
+        ["Design-input meeting; consultant uploads meeting note / sketch","con"],
+        ["Consultant uploads revised drawings; PPD checks details","ppd"],
+        ["If OK → proceed to online submission (system reflects green)","auto"]],
+      depts:"km"},
+    {n:3,label:"Submission Fee Prep",st:S.green,date:"18 Mar 26",
+      steps:[["System reminds consultant to upload fee calculation (2 weeks prior)","auto"],
+        ["Consultant uploads fee-calc PDF","con"],
+        ["PPD verifies plan-fee amount → links to Payment Requisition flow","ppd"]]},
+    {n:4,label:"Online Submission (Master KM)",st:S.orange,date:"01 Apr 26",
+      steps:[["Planner compiles documents per checklist (drawings &amp; docs in PDF)","con"],
+        ["System auto-ticks checklist as consultant uploads required items","auto"],
+        ["PPD checks uploaded items are in order","ppd"],
+        ["Consultant submits Master KM online &amp; uploads acknowledgement","con"],
+        ["System alerts if acknowledgement not uploaded 1 day after target","auto"]],
+      depts:"km"},
+    {n:5,label:"Processing Fee Payment",st:S.amber,date:"—",
+      steps:[["Consultant uploads QR code / invoice to system","con"],
+        ["System links to Payment Requisition flow (auto notification-letter template)","auto"],
+        ["PPD verifies &amp; routes for approval","ppd"]]},
+    {n:6,label:"Hardcopies Submission",st:S.grey,date:"—",
+      steps:[["Consultant uploads OSC acceptance screenshot &amp; payment slip","con"],
+        ["System notifies to print for hardcopy submission (1 week before target)","auto"],
+        ["Consultant uploads acknowledgement of hardcopy submission","con"],
+        ["System prompts if hardcopy not uploaded after 1-day delay","auto"]]},
+    {n:7,label:"OSC Meeting",st:S.grey,date:"—",
+      steps:[["Consultant follows up on OSC meeting date; PPD keys in confirmed date","ppd"],
+        ["Continue follow-up with departments for clearance / comment letters","con"],
+        ["Weekly submission-status update sent out","auto"]]},
+    {n:8,label:"Departments Clearance",st:S.grey,date:"—",
+      steps:[["Consultant uploads tiada-halangan / ulasan letter or approval per dept","con"],
+        ["System reflects colour status per department","auto"],
+        ["If delay ≥ 2 weeks → system triggers PPD-HOD &amp; PIC; auto-redistributes timeline without affecting AP","auto"]],
+      depts:"km"},
+    {n:9,label:"Comments Compliance",st:S.grey,date:"—",
+      steps:[["Consultant uploads authority ulasan / comments; system reflects status","con"],
+        ["System routes comment letter to HOD-PPD: choose Compliance or Appeal","auto"],
+        ["Compliance: PPD discusses with consultant, sets resubmit days, consultant re-uploads","ppd"],
+        ["Appeal: system searches WIKI for similar successful appeal; reflects blue wording","auto"]]},
+    {n:10,label:"Master KM Approval",st:S.grey,date:"—",
+      steps:[["Consultant uploads approval letter; PPD reviews &amp; highlights special conditions","ppd"],
+        ["System records date &amp; displays in summary","auto"],
+        ["System notifies Consultant, PPD, HOD, TH: “Approval for Master KM obtained”","auto"],
+        ["System forwards approved KM layout to land surveyor for precom plan","auto"]]}
+  ]
+};
+
+/* ---- MASTER INFRA ---- */
+const MINFRA = {
+  name:"Master Infra", title:"Master Infra Submission Tracking",
+  sub:"Starts upon Master KM approved · per-trait demarcation, timeline auto-generated from checklist durations",
+  traits:["Earthwork","Road & Drainage","Streetlighting","Sewerage","Water Supply","Power","Telekom"],
+  gauges:[
+    {cap:"Setup & Timeline",done:3,total:3},
+    {cap:"Pre-Consultation",done:4,total:6},
+    {cap:"Submission",done:2,total:8},
+    {cap:"Approval / Compliance",done:1,total:6}
+  ],
+  milestones:[
+    {n:1,label:"Setup Master Infra (demarcation, traits, consultants)",st:S.green,date:"15 Jun 26",
+      steps:[["PPD sets boundary, traits &amp; consultant on the Master Infra submission","ppd"],
+        ["System notifies consultant on document preparation","auto"],
+        ["Timeline auto-generates from pre-set duration (baseline for tracking)","auto"],
+        ["System notifies consultants, CA, PI on the timeline","auto"]]},
+    {n:2,label:"Pre-Consultation (Master Infra)",st:S.amber,date:"—",
+      steps:[["System notifies all consultants to prepare for pre-consultation &amp; submission","auto"],
+        ["Consultant makes appointment &amp; uploads pre-consultation comments","con"],
+        ["Design-input meeting; consultant uploads note / sketch","con"],
+        ["Consultant uploads revised drawings; PPD checks; if OK → online submission","ppd"]],
+      depts:"infra"},
+    {n:3,label:"Start — Submission (Master Infra)",st:S.orange,date:"—",
+      steps:[["Planner compiles documents in system (drawings &amp; docs per checklist)","con"],
+        ["Standard docs pre-saved in Data Storage folder","auto"],
+        ["System notifies PPD to check uploaded items; reminder 2 weeks prior","auto"],
+        ["Consultant submits Master Infra &amp; uploads submission copy","con"],
+        ["System alerts if acknowledgement not uploaded 1 day after target","auto"]],
+      depts:"infra"},
+    {n:4,label:"Processing / Statutory Fee",st:S.grey,date:"—",
+      steps:[["Consultant uploads invoice to system","con"],
+        ["System links to Payment Requisition flow (auto notification-letter template)","auto"],
+        ["PPD verifies &amp; routes for approval","ppd"]]},
+    {n:5,label:"Comments Compliance",st:S.grey,date:"—",
+      steps:[["Consultant uploads authority ulasan / comments; system reflects status","con"],
+        ["System routes comment letter to HOD-PPD: Compliance or Appeal","auto"],
+        ["Compliance: PPD discusses, sets resubmit days; consultant re-uploads for approval","ppd"],
+        ["Appeal: auto-adjusts duration; WIKI search for similar successful appeal (blue wording)","auto"]]},
+    {n:6,label:"Compliance / Appeal / Approval",st:S.grey,date:"—",
+      steps:[["Consultant discusses compliance details with PPD, updates drawings","con"],
+        ["Consultant uploads endorsement set; PPD approves; consultant proceeds submission","ppd"],
+        ["Consultant uploads approved letter &amp; drawings; system notifies PPD &amp; PI","con"],
+        ["If surprise condition in approval letter → repeat Appeal process","ppd"]]},
+    {n:7,label:"Work Commencement / Subsequent Stages",st:S.grey,date:"—",
+      steps:[["Earthwork — consultant submits Borang B (Notis Mula Kerja Tanah), notifies PPD &amp; PI","con"],
+        ["Road &amp; Drainage / Streetlighting — end at approval","auto"],
+        ["Sewerage — repeat Setup→Approval for subsequent stages PDC2, PDC3-5","auto"],
+        ["Water Supply — repeat Setup→Approval for Detail stage","auto"]]}
+  ]
+};
+
+/* ---- LOCAL INFRA ---- */
+const LINFRA = {
+  name:"Local Infra", title:"Local Infra Submission Tracking (Agency-level)",
+  sub:"Per-agency infrastructure submission · auto-ping every 3 days, manual PPD ping available",
+  traits:["Sewerage (IWK)","Water Supply (AIS)","Earthwork","Road & Drainage","Streetlighting","Power (TNB)","Telekom (SKMM)"],
+  gauges:[
+    {cap:"Sewerage (IWK)",done:6,total:6},
+    {cap:"Water Supply (AIS)",done:3,total:6},
+    {cap:"Road & Drainage",done:2,total:6},
+    {cap:"Earthwork",done:4,total:6}
+  ],
+  milestones:[
+    {n:1,label:"Upload Documents (per checklist)",st:S.green,date:"20 Jun 26",
+      steps:[["Consultant &amp; PPD upload relevant documents required per checklist","con"],
+        ["System auto-ticks submission checklist as items are uploaded","auto"],
+        ["Documents pre-saved in Data Storage per document checklist","auto"]]},
+    {n:2,label:"Submit for Checking",st:S.green,date:"27 Jun 26",
+      steps:[["Consultant clicks “Submit for Checking”","con"],
+        ["System sends notification to PPD to prompt checking","auto"]]},
+    {n:3,label:"PPD Check & Comment",st:S.amber,date:"—",
+      steps:[["PPD checks; if comment → clicks “Send Comment” with remarks","ppd"],
+        ["System allows note &amp; sketch remark","auto"],
+        ["If in order → PPD clicks “Recommended for Submission”","ppd"]]},
+    {n:4,label:"SM / HOD Green Light",st:S.grey,date:"—",
+      steps:[["System notifies SM / HOD / set personnel for green light to proceed","auto"],
+        ["If comment → SM/HOD clicks “Send Comment”; repeat from Upload","sm"],
+        ["If OK → SM/HOD clicks “Recommended for Submission”; notify consultant &amp; PPD","sm"]]},
+    {n:5,label:"Actual Submission",st:S.orange,date:"—",
+      steps:[["Consultant submits to agency","con"],
+        ["Consultant uploads submission acknowledgement (status grey → orange)","con"],
+        ["System tracks &amp; displays submission date","auto"]]},
+    {n:6,label:"Follow-up & Status Tracking",st:S.grey,date:"—",
+      steps:[["System auto-pings every 3 days: “Hi, it’s been 3 days, kindly update status”","auto"],
+        ["PPD may ping consultant manually for update","ppd"],
+        ["Consultant follows up with agency on submission status","con"]]},
+    {n:7,label:"Comment / Approval Letter",st:S.grey,date:"—",
+      steps:[["Consultant uploads comment or approval letter; system records date","con"],
+        ["If comment letter → repeat from Upload Documents","auto"],
+        ["If approval letter → PPD reviews, highlights special conditions, closes file","ppd"],
+        ["System notifies Consultant, PPD, HOD, TH: “Approval for [trait] obtained”","auto"]]}
+  ]
+};
+
+/* ---- department clearance sample sets ---- */
+const DEPTS_KM = [
+  {c:"OSC",s:S.green},{c:"JPP",s:S.green},{c:"JKB",s:S.amber},{c:"JPS",s:S.green},
+  {c:"JMG",s:S.red},{c:"JKR",s:S.amber},{c:"IWK",s:S.grey},{c:"TNB",s:S.green},
+  {c:"Air Slgr",s:S.grey},{c:"SKMM",s:S.grey}
+];
+const DEPTS_INFRA = [
+  {c:"JPS",s:S.green},{c:"IWK",s:S.amber},{c:"Air Slgr",s:S.orange},{c:"TNB",s:S.grey},
+  {c:"JKR",s:S.green},{c:"SKMM",s:S.grey},{c:"JMG",s:S.red},{c:"JKT",s:S.grey}
+];
+
+const DASHES = {mkm:MKM, minfra:MINFRA, linfra:LINFRA};
+let currentDash = "mkm";
+let currentTrait = 0;
+let selMilestone = 1;
+
+/* ============ RENDER ============ */
+function fmtToday(){return TODAY.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
+
+function buildProjTree(){
+  const t = document.getElementById('projTree');
+  t.innerHTML = projects.map(p=>
+    `<div class="tree-item lvl2 ${p===currentProj?'active':''}" data-proj="${p}">
+       <span class="caret">•</span>${p}</div>`).join('');
+  t.querySelectorAll('[data-proj]').forEach(el=>el.onclick=()=>{currentProj=el.dataset.proj;render();});
+}
+
+function gaugeSVG(done,total){
+  const r=34,cx=45,cy=45, seg=total, gap=6;
+  const startA=-210, sweep=240; // arc
+  let out=`<svg width="90" height="70" viewBox="0 0 90 62">`;
+  for(let i=0;i<seg;i++){
+    const a0=startA + (sweep/seg)*i + gap/seg/2;
+    const a1=startA + (sweep/seg)*(i+1) - gap/seg/2;
+    const p0=pt(cx,cy,r,a0), p1=pt(cx,cy,r,a1);
+    const large = (a1-a0)>180?1:0;
+    const col = i<done ? '#1d4ed8' : '#e2e6ec';
+    out+=`<path d="M${p0.x} ${p0.y} A${r} ${r} 0 ${large} 1 ${p1.x} ${p1.y}" stroke="${col}" stroke-width="8" fill="none" stroke-linecap="round"/>`;
+    const lp=pt(cx,cy,r,(a0+a1)/2);
+  }
+  out+=`<text x="45" y="44" text-anchor="middle" font-size="15" font-weight="800" fill="#1f2937">${done}</text>`;
+  out+=`<text x="45" y="55" text-anchor="middle" font-size="8" fill="#6b7280">of ${total}</text></svg>`;
+  return out;
+}
+function pt(cx,cy,r,ang){const a=ang*Math.PI/180;return{x:cx+r*Math.cos(a),y:cy+r*Math.sin(a)};}
+
+function render(){
+  const d = DASHES[currentDash];
+  document.getElementById('updDate').textContent = fmtToday();
+  document.getElementById('dashName').textContent = d.name;
+  document.getElementById('dashProj').textContent = "ECO GRANDEUR · "+currentProj;
+  document.getElementById('dashSub').textContent = d.sub;
+  document.getElementById('crumbProj').textContent = currentProj;
+  document.getElementById('crumbDash').textContent = d.name;
+  document.getElementById('tlTitle').textContent = d.title;
+
+  // countdown
+  const dl = daysLeft();
+  document.getElementById('cdN').textContent = dl;
+  document.getElementById('countdown').classList.toggle('warn', dl<200);
+
+  // tabs active state
+  document.querySelectorAll('#subTabs .tab[data-dash]').forEach(t=>
+    t.classList.toggle('active', t.dataset.dash===currentDash));
+
+  // sidebar tree
+  buildProjTree();
+
+  // KPI cards (derived from milestones)
+  renderKPIs(d);
+
+  // gauges
+  document.getElementById('gauges').innerHTML = d.gauges.map(g=>
+    `<div class="gauge">${gaugeSVG(g.done,g.total)}<div class="cap">${g.cap}</div>
+     <div class="pct">${Math.round(g.done/g.total*100)}% complete</div></div>`).join('');
+
+  // trait subtabs for infra dashboards
+  renderTraitTabs(d);
+
+  // timeline
+  renderTimeline(d);
+
+  // drill-in
+  selMilestone = Math.min(selMilestone, d.milestones.length);
+  renderDrill(d);
+}
+
+function renderKPIs(d){
+  const m=d.milestones;
+  const count=s=>m.filter(x=>x.st===s).length;
+  const cards=[
+    {k:"Milestones",v:m.length,cls:""},
+    {k:"Completed",v:count(S.green),cls:"g"},
+    {k:"In progress",v:count(S.amber)+count(S.orange),cls:"o"},
+    {k:"Delayed",v:count(S.red),cls:"r"},
+    {k:"Not started",v:count(S.grey),cls:"d"}
+  ];
+  document.getElementById('kpis').innerHTML = cards.map(c=>
+    `<div class="card ${c.cls}"><div class="k">${c.k}</div><div class="v">${c.v}</div></div>`).join('');
+}
+
+function renderTraitTabs(d){
+  const tl=document.getElementById('tlTitle').parentElement;
+  let holder=document.getElementById('traitTabs');
+  if(holder) holder.remove();
+  if(d.traits){
+    const el=document.createElement('div');
+    el.id='traitTabs'; el.className='subtabs';
+    el.style.margin='0 15px 0';
+    el.innerHTML='<div style="width:100%;font-size:10.5px;color:#6b7280;margin:8px 0 2px">Infrastructure trait / stage:</div>'+
+      d.traits.map((t,i)=>`<div class="subtab ${i===currentTrait?'active':''}" data-t="${i}">${t}</div>`).join('');
+    tl.insertAdjacentElement('afterend', el);
+    el.querySelectorAll('[data-t]').forEach(x=>x.onclick=()=>{currentTrait=+x.dataset.t;render();});
+  }
+}
+
+function renderTimeline(d){
+  const tl=document.getElementById('timeline');
+  tl.innerHTML=d.milestones.map(m=>{
+    const done = m.st===S.green;
+    return `<div class="tl-node ${done?'done':''}">
+      <div class="tl-dot ${m.st} ${m.n===selMilestone?'sel':''}" data-n="${m.n}" title="${statusLabel[m.st]}">${m.n}</div>
+      <div class="tl-label">${m.label}</div>
+      <div class="tl-date">${m.date||'&nbsp;'}</div>
+    </div>`;
+  }).join('');
+  tl.querySelectorAll('[data-n]').forEach(dot=>dot.onclick=()=>{selMilestone=+dot.dataset.n;renderDrill(d);
+    tl.querySelectorAll('.tl-dot').forEach(x=>x.classList.remove('sel'));dot.classList.add('sel');});
+}
+
+function tagFor(t){return{auto:['AUTO','tag-auto'],ppd:['PPD','tag-ppd'],con:['CONSULTANT','tag-con'],sm:['SM/HOD','tag-sm']}[t]||['','']; }
+
+function renderDrill(d){
+  const m=d.milestones.find(x=>x.n===selMilestone);
+  document.getElementById('drillTitle').textContent = `Step ${m.n} · ${m.label.replace(/&amp;/g,'&')}`;
+  document.getElementById('drillHint').innerHTML = `Status: <b>${statusLabel[m.st]}</b>${m.date&&m.date!=='—'?' · '+m.date:''}`;
+
+  // steps
+  document.getElementById('drillSteps').innerHTML =
+    `<div style="font-size:11px;color:#6b7280;margin-bottom:8px">Actions in this milestone</div>
+     <ol class="steps">`+ m.steps.map(s=>{
+      const [txt,tg]=s; const [lbl,cls]=tagFor(tg);
+      return `<li>${txt}<span class="step-tag ${cls}">${lbl}</span></li>`;
+     }).join('') + `</ol>`;
+
+  // side: dept grid if any + doc/status
+  let side='';
+  if(m.depts){
+    const set = m.depts==='km'?DEPTS_KM:DEPTS_INFRA;
+    side += `<div style="font-size:11px;font-weight:700;margin-bottom:8px">Department Clearance
+      <span class="muted" style="font-weight:400">(dot-status per authority)</span></div>
+      <div class="dept-grid">`+ set.map(x=>
+        `<div class="dept ${x.s}" title="${statusLabel[x.s]}">${x.c}<small>${statusLabel[x.s].split(' ')[0]}</small></div>`).join('')+`</div>`;
+  }
+  // sample document checklist
+  side += `<div style="font-size:11px;font-weight:700;margin:14px 0 4px">Document Checklist
+    <span class="ping" onclick="alert('Manual ping sent to consultant: kindly update status.')">Ping consultant</span></div>`;
+  const docs = sampleDocs(m);
+  side += docs.map(dc=>
+    `<div class="doc-row"><span class="chk ${dc.s}">${dc.done?'✓':''}</span>${dc.name}
+      <span class="pill ${dc.p}">${dc.tag}</span></div>`).join('');
+
+  side += `<div class="info">Timeline is baseline <b>R0</b>; revised programs (R1, R2…) approved by CDO show below R0 for comparison.
+    System auto-pings every 3 days on pending items and auto-redistributes duration on delay without moving the AP target.</div>`;
+  document.getElementById('drillSide').innerHTML = side;
+}
+
+function sampleDocs(m){
+  // deterministic-ish sample by status
+  const base=[
+    {name:"Layout drawings (PDF)"},{name:"Reports / calculation"},
+    {name:"Cover letter / Borang"},{name:"Acknowledgement copy"}
+  ];
+  return base.map((b,i)=>{
+    let done,p,tag;
+    if(m.st===S.green){done=true;p='green';tag='Uploaded';}
+    else if(m.st===S.orange){done=i<2;p=i<2?'green':'amber';tag=i<2?'Uploaded':'Pending';}
+    else if(m.st===S.amber){done=i<1;p=i<1?'green':'amber';tag=i<1?'Uploaded':'In progress';}
+    else if(m.st===S.red){done=i<1;p=i<1?'green':'red';tag=i<1?'Uploaded':'Overdue';}
+    else {done=false;p='grey';tag='Not started';}
+    return {...b,done,p,tag};
+  });
+}
+
+/* ---- tab wiring ---- */
+document.querySelectorAll('#subTabs .tab[data-dash]').forEach(t=>t.onclick=()=>{
+  currentDash=t.dataset.dash; currentTrait=0; selMilestone=1; render();
+});
+
+buildProjTree();
+render();
+</script>
+</body>
+</html>
