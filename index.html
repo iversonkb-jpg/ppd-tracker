@@ -642,37 +642,5 @@ document.querySelectorAll('#subTabs .tab[data-dash]').forEach(t=>t.onclick=()=>{
 buildProjTree();
 render();
 </script>
-
-<!-- ===== PASSCODE GATE ===== -->
-<style>
-#gate{position:fixed;inset:0;z-index:9999;background:#0f172a;display:grid;place-items:center;font-family:"Segoe UI",Roboto,Arial,sans-serif}
-#gate .box{background:#fff;border-radius:14px;padding:28px 30px;width:320px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.4)}
-#gate h3{margin:0 0 4px;font-size:17px;color:#1f2937}
-#gate p{margin:0 0 16px;font-size:12px;color:#6b7280}
-#gate input{width:100%;padding:11px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;text-align:center;letter-spacing:2px}
-#gate button{margin-top:12px;width:100%;padding:11px;border:none;border-radius:8px;background:#1d4ed8;color:#fff;font-size:14px;font-weight:600}
-#gate .err{color:#dc2626;font-size:11.5px;height:14px;margin-top:8px}
-</style>
-<div id="gate">
-  <div class="box">
-    <h3>PPD Digitalization Dashboard</h3>
-    <p>Enter passcode to view</p>
-    <input id="gateInput" type="password" placeholder="••••••" autocomplete="off"
-      onkeydown="if(event.key==='Enter')checkGate()">
-    <button onclick="checkGate()">Enter</button>
-    <div class="err" id="gateErr"></div>
-  </div>
-</div>
-<script>
-/* Change PASSCODE to whatever you like. Note: this is a light gate to deter
-   casual access — a determined viewer can read it in the page source. */
-const PASSCODE = "ppd2026";
-function checkGate(){
-  const v=document.getElementById('gateInput').value;
-  if(v===PASSCODE){document.getElementById('gate').style.display='none';}
-  else{document.getElementById('gateErr').textContent='Incorrect passcode';}
-}
-document.getElementById('gateInput').focus();
-</script>
 </body>
 </html>
