@@ -288,119 +288,119 @@ const S = {green:"st-green",amber:"st-amber",orange:"st-orange",red:"st-red",gre
 const statusLabel = {"st-green":"Completed","st-amber":"In progress / Ulasan","st-orange":"Submitted & pending",
   "st-red":"Delayed / Overdue","st-grey":"Not started","st-appeal":"Appeal case"};
 
-/* ---- MASTER KM ---- */
+/* ---- MASTER KM (r2: Kebenaran Merancang via OSC 3.0 Plus) ---- */
 const MKM = {
-  name:"Master KM", title:"Master KM (Kebenaran Merancang) Submission Tracking",
-  sub:"Pre-SPA masterplan → Master KM approval · pre-set duration auto-generates the timeline",
+  name:"Master KM", title:"Master KM (Kebenaran Merancang) Submission Tracking · OSC 3.0 Plus",
+  sub:"Carried over from CEO-cleared Masterplan (Stage B) → KM approval · management approval carried over; timeline auto-generated from pre-set durations",
   gauges:[
-    {cap:"Master Planning",done:9,total:11},
-    {cap:"Pre-Consultation",done:5,total:6},
-    {cap:"KM Submission",done:3,total:8},
-    {cap:"Authority Clearance",done:4,total:10}
+    {cap:"Setup & Coordination",done:6,total:6},
+    {cap:"Agency Gate (G1–G8)",done:5,total:8},
+    {cap:"OSC Submission",done:3,total:6},
+    {cap:"Deliberation & Approval",done:0,total:6}
   ],
   milestones:[
-    {n:1,label:"Setup & Access Limit",st:S.green,date:"12 Jan 26",
-      steps:[["PPD-HOD to set boundary, traits &amp; consultants; system auto-generates timeline from pre-set duration","auto"],
-        ["Timeline baseline (R0) locked; only HOD+ may edit","ppd"],
-        ["System notifies consultants, CA, PI on the timeline","auto"]]},
-    {n:2,label:"Pre-Consultation & Upload Doc",st:S.green,date:"05 Mar 26",
-      steps:[["Consultant makes pre-consultation appointment &amp; uploads comments","con"],
-        ["Design-input meeting; consultant uploads meeting note / sketch","con"],
-        ["Consultant uploads revised drawings; PPD checks details","ppd"],
-        ["If OK → proceed to online submission (system reflects green)","auto"]],
+    {n:1,label:"Setup & Consultant LOA",st:S.green,date:"12 Jan 26",
+      steps:[["TRIGGER: carried over from Stage B — Masterplan cleared by CEO for submission","ppd"],
+        ["PPD-HOD confirms appointment / LOA of submitting consultants from Consultant Management","ppd"],
+        ["System issues LOA; consultants upload acceptance &amp; professional details","auto"]]},
+    {n:2,label:"Pre-Submission Coordination",st:S.green,date:"05 Feb 26",
+      steps:[["PPD-HOD convenes KM pre-submission coordination meeting (Town Planner + sub-consultants)","ppd"],
+        ["Town Planner prepares Development Proposal Report (LCP — Laporan Cadangan Pemajuan) &amp; KM set","con"],
+        ["PPD confirms SIA &amp; EIA approvals and TIA report are ready to accompany the KM","ppd"]]},
+    {n:3,label:"Agency Approval Gate (G1–G8)",st:S.amber,date:"—",
+      steps:[["GATE: all external technical agency approvals must be in place — JKR, IWK, Water, JPS, TNB, Telco, JMG, Land","ppd"],
+        ["System reflects colour status per agency; KM cannot proceed until gate cleared","auto"]],
       depts:"km"},
-    {n:3,label:"Submission Fee Prep",st:S.green,date:"18 Mar 26",
-      steps:[["System reminds consultant to upload fee calculation (2 weeks prior)","auto"],
-        ["Consultant uploads fee-calc PDF","con"],
-        ["PPD verifies plan-fee amount → links to Payment Requisition flow","ppd"]]},
-    {n:4,label:"Online Submission (Master KM)",st:S.orange,date:"01 Apr 26",
-      steps:[["Planner compiles documents per checklist (drawings &amp; docs in PDF)","con"],
-        ["System auto-ticks checklist as consultant uploads required items","auto"],
-        ["PPD checks uploaded items are in order","ppd"],
-        ["Consultant submits Master KM online &amp; uploads acknowledgement","con"],
-        ["System alerts if acknowledgement not uploaded 1 day after target","auto"]],
+    {n:4,label:"OSC 3.0 Plus Online Submission",st:S.orange,date:"01 Apr 26",
+      steps:[["PPD-HOD / PSP makes the OSC ONLINE submission via OSC 3.0 Plus — upload KM set &amp; supporting docs","con"],
+        ["OSC vets the online submission (semakan kelengkapan); PSP updates online if any document short","con"],
+        ["System auto-ticks checklist as items uploaded; alerts if acknowledgement not uploaded","auto"]],
       depts:"km"},
-    {n:5,label:"Processing Fee Payment",st:S.amber,date:"—",
-      steps:[["Consultant uploads QR code / invoice to system","con"],
-        ["System links to Payment Requisition flow (auto notification-letter template)","auto"],
-        ["PPD verifies &amp; routes for approval","ppd"]]},
-    {n:6,label:"Hardcopies Submission",st:S.grey,date:"—",
-      steps:[["Consultant uploads OSC acceptance screenshot &amp; payment slip","con"],
-        ["System notifies to print for hardcopy submission (1 week before target)","auto"],
-        ["Consultant uploads acknowledgement of hardcopy submission","con"],
-        ["System prompts if hardcopy not uploaded after 1-day delay","auto"]]},
-    {n:7,label:"OSC Meeting",st:S.grey,date:"—",
-      steps:[["Consultant follows up on OSC meeting date; PPD keys in confirmed date","ppd"],
-        ["Continue follow-up with departments for clearance / comment letters","con"],
-        ["Weekly submission-status update sent out","auto"]]},
-    {n:8,label:"Departments Clearance",st:S.grey,date:"—",
-      steps:[["Consultant uploads tiada-halangan / ulasan letter or approval per dept","con"],
-        ["System reflects colour status per department","auto"],
-        ["If delay ≥ 2 weeks → system triggers PPD-HOD &amp; PIC; auto-redistributes timeline without affecting AP","auto"]],
-      depts:"km"},
-    {n:9,label:"Comments Compliance",st:S.grey,date:"—",
-      steps:[["Consultant uploads authority ulasan / comments; system reflects status","con"],
-        ["System routes comment letter to HOD-PPD: choose Compliance or Appeal","auto"],
-        ["Compliance: PPD discusses with consultant, sets resubmit days, consultant re-uploads","ppd"],
-        ["Appeal: system searches WIKI for similar successful appeal; reflects blue wording","auto"]]},
-    {n:10,label:"Master KM Approval",st:S.grey,date:"—",
-      steps:[["Consultant uploads approval letter; PPD reviews &amp; highlights special conditions","ppd"],
-        ["System records date &amp; displays in summary","auto"],
-        ["System notifies Consultant, PPD, HOD, TH: “Approval for Master KM obtained”","auto"],
-        ["System forwards approved KM layout to land surveyor for precom plan","auto"]]}
+    {n:5,label:"Processing Fee Payment",st:S.grey,date:"—",
+      steps:[["FEE: upon online submission approved (complete), PSP pays processing / application fee","con"],
+        ["System links to Payment Requisition flow (auto notification-letter template)","auto"]]},
+    {n:6,label:"Hardcopy Submission",st:S.grey,date:"—",
+      steps:[["PSP submits the HARDCOPY set to the OSC counter (after online approval &amp; fee payment)","con"],
+        ["System records OSC submission date / reference no. &amp; tracks statutory processing period","auto"]]},
+    {n:7,label:"OSC Circulation & Query Clearance",st:S.grey,date:"—",
+      steps:[["OSC circulates KM to internal departments; PPD / consultants confirm all external agency approvals in","con"],
+        ["Consultants upload responses / amended plans for each OSC / agency query","con"],
+        ["Repeat until all comments cleared &amp; all agency approvals confirmed","auto"],
+        ["PPD-HOD updates management on KM processing status (periodic)","ppd"]]},
+    {n:8,label:"OSC Board Deliberation",st:S.grey,date:"—",
+      steps:[["OSC Technical Committee / Full Board (Mesyuarat JK OSC) deliberates the KM","auto"],
+        ["OSC issues decision: (a) Approved; (b) Approved with conditions; (c) Deferred / rejected","auto"]]},
+    {n:9,label:"Comply / Appeal",st:S.grey,date:"—",
+      steps:[["COMPLY path: consultants amend plans, resubmit for re-deliberation","con"],
+        ["APPEAL path: PPD-HOD evaluates &amp; lodges appeal (checks WIKI for similar successful cases)","ppd"],
+        ["OSC / Appeal Board re-deliberates; repeat comply-or-appeal until KM approved","auto"]]},
+    {n:10,label:"KM Approval & Charges",st:S.grey,date:"—",
+      steps:[["FEE: PBT issues KM approval (Kebenaran Merancang) with conditions (syarat C1 / C2)","auto"],
+        ["Pay KM / development charge (Caj Pemajuan) &amp; any bank guarantee as billed","con"],
+        ["Town Planner uploads the KM approval letter &amp; conditions into the system","con"]]},
+    {n:11,label:"Conditions Review & Handover",st:S.grey,date:"—",
+      steps:[["PPD-HOD reviews KM conditions, registers compliance items, briefs CDO / GM / S&amp;M","ppd"],
+        ["System notifies Consultant, PPD, HOD, TH: “Master KM approval obtained”","auto"],
+        ["PPD-HOD hands over to next stage — Building Plan / Earthworks / Infrastructure works","ppd"]]}
   ]
 };
 
-/* ---- MASTER INFRA ---- */
+/* ---- MASTER INFRA (r2: per-trait G1–G7, post-KM approval) ---- */
 const MINFRA = {
-  name:"Master Infra", title:"Master Infra Submission Tracking",
-  sub:"Starts upon Master KM approved · per-trait demarcation, timeline auto-generated from checklist durations",
+  name:"Master Infra", title:"Master Infra Submission Tracking · per-trait (G1–G7)",
+  sub:"Triggered upon Master KM approval · each trait demarcated separately; timeline auto-generated from Infra Doc-Checklist durations",
   traits:["Earthwork","Road & Drainage","Streetlighting","Sewerage","Water Supply","Power","Telekom"],
   gauges:[
-    {cap:"Setup & Timeline",done:3,total:3},
-    {cap:"Pre-Consultation",done:4,total:6},
-    {cap:"Submission",done:2,total:8},
-    {cap:"Approval / Compliance",done:1,total:6}
+    {cap:"Setup & Doc Prep",done:3,total:3},
+    {cap:"Pre-Consultation",done:2,total:3},
+    {cap:"Submission & Fee",done:1,total:3},
+    {cap:"Approval / Comply",done:0,total:3}
   ],
   milestones:[
-    {n:1,label:"Setup Master Infra (demarcation, traits, consultants)",st:S.green,date:"15 Jun 26",
-      steps:[["PPD sets boundary, traits &amp; consultant on the Master Infra submission","ppd"],
-        ["System notifies consultant on document preparation","auto"],
-        ["Timeline auto-generates from pre-set duration (baseline for tracking)","auto"],
-        ["System notifies consultants, CA, PI on the timeline","auto"]]},
-    {n:2,label:"Pre-Consultation (Master Infra)",st:S.amber,date:"—",
-      steps:[["System notifies all consultants to prepare for pre-consultation &amp; submission","auto"],
-        ["Consultant makes appointment &amp; uploads pre-consultation comments","con"],
-        ["Design-input meeting; consultant uploads note / sketch","con"],
-        ["Consultant uploads revised drawings; PPD checks; if OK → online submission","ppd"]],
-      depts:"infra"},
-    {n:3,label:"Start — Submission (Master Infra)",st:S.orange,date:"—",
-      steps:[["Planner compiles documents in system (drawings &amp; docs per checklist)","con"],
-        ["Standard docs pre-saved in Data Storage folder","auto"],
-        ["System notifies PPD to check uploaded items; reminder 2 weeks prior","auto"],
-        ["Consultant submits Master Infra &amp; uploads submission copy","con"],
-        ["System alerts if acknowledgement not uploaded 1 day after target","auto"]],
-      depts:"infra"},
-    {n:4,label:"Processing / Statutory Fee",st:S.grey,date:"—",
-      steps:[["Consultant uploads invoice to system","con"],
-        ["System links to Payment Requisition flow (auto notification-letter template)","auto"],
-        ["PPD verifies &amp; routes for approval","ppd"]]},
-    {n:5,label:"Comments Compliance",st:S.grey,date:"—",
-      steps:[["Consultant uploads authority ulasan / comments; system reflects status","con"],
-        ["System routes comment letter to HOD-PPD: Compliance or Appeal","auto"],
-        ["Compliance: PPD discusses, sets resubmit days; consultant re-uploads for approval","ppd"],
-        ["Appeal: auto-adjusts duration; WIKI search for similar successful appeal (blue wording)","auto"]]},
-    {n:6,label:"Compliance / Appeal / Approval",st:S.grey,date:"—",
-      steps:[["Consultant discusses compliance details with PPD, updates drawings","con"],
-        ["Consultant uploads endorsement set; PPD approves; consultant proceeds submission","ppd"],
-        ["Consultant uploads approved letter &amp; drawings; system notifies PPD &amp; PI","con"],
-        ["If surprise condition in approval letter → repeat Appeal process","ppd"]]},
-    {n:7,label:"Work Commencement / Subsequent Stages",st:S.grey,date:"—",
-      steps:[["Earthwork — consultant submits Borang B (Notis Mula Kerja Tanah), notifies PPD &amp; PI","con"],
-        ["Road &amp; Drainage / Streetlighting — end at approval","auto"],
-        ["Sewerage — repeat Setup→Approval for subsequent stages PDC2, PDC3-5","auto"],
-        ["Water Supply — repeat Setup→Approval for Detail stage","auto"]]}
+    {n:1,label:"Setup & Demarcation",st:S.green,date:"15 Jun 26",
+      steps:[["TRIGGER: upon Master KM approval, PPD-HOD flags the trait submission &amp; demarcates the boundary","ppd"],
+        ["System auto-generates the timeline (pre-set durations) &amp; notifies consultant, CA &amp; PI","auto"]]},
+    {n:2,label:"Document Preparation",st:S.green,date:"22 Jun 26",
+      steps:[["Consultant / PPD prepare the documents per the Infra Doc Checklist","con"],
+        ["System auto-ticks the checklist as items are uploaded to Data Storage","auto"]]},
+    {n:3,label:"Pre-Consultation & Design Coordination",st:S.amber,date:"—",
+      steps:[["PRE-CONSULTATION: consultant makes the pre-consultation appointment with the authority","con"],
+        ["Combined Infra Design-Coordination Meeting — single joint session for G1–G7","con"],
+        ["PPD checks revised drawings — if OK proceed to submission (green); if not, revise","ppd"]],
+      depts:"trait"},
+    {n:4,label:"Fee Prep & Submission",st:S.orange,date:"—",
+      steps:[["FEE: consultant uploads the fee calculation; PPD verifies → Payment Requisition flow","con"],
+        ["SUBMIT: consultant compiles per checklist &amp; submits the plan / report to the authority","con"],
+        ["System records the submission; consultant follows up with the authority","auto"]],
+      depts:"trait"},
+    {n:5,label:"Statutory Fee Payment",st:S.grey,date:"—",
+      steps:[["FEE: payment of processing / statutory fee (per checklist) — consultant uploads the slip","con"],
+        ["System links to Payment Requisition flow (auto notification-letter template)","auto"]]},
+    {n:6,label:"Comments — Comply / Appeal",st:S.grey,date:"—",
+      steps:[["COMMENTS: consultant uploads the ulasan / comments; system flows to HOD-PPD","con"],
+        ["COMPLY: update drawings; PPD sets resubmission days; consultant resubmits","ppd"],
+        ["APPEAL: HOD-PPD lodges the appeal (checks WIKI); consultant discusses with the authority","ppd"],
+        ["Repeat until the authority clears the submission","auto"]],
+      depts:"trait"},
+    {n:7,label:"Approval & Endorsement",st:S.grey,date:"—",
+      steps:[["APPROVAL: consultant uploads the endorsement set; client signs; consultant proceeds","con"],
+        ["System reflects colour status update on approval","auto"]]},
+    {n:8,label:"Work Commencement / Registration",st:S.grey,date:"—",
+      steps:[["Earthwork — consultant submits Borang B (Notis Mula Kerja Tanah) &amp; uploads to system","con"],
+        ["PPD-HOD registers the approval &amp; conditions and updates the township dashboard","ppd"],
+        ["Sewerage / Water — repeat Setup→Approval for subsequent stages (PDC2, PDC3-5 / Detail)","auto"]]}
   ]
+};
+
+/* per-trait authority clearance sets (revised r2) */
+const TRAIT_AUTH = {
+  "Earthwork":      [{c:"PBT",s:S.green},{c:"JPS (ESCP)",s:S.amber},{c:"JMG (slope)",s:S.grey}],
+  "Road & Drainage":[{c:"PBT",s:S.green},{c:"JKR",s:S.amber},{c:"JPS",s:S.grey}],
+  "Streetlighting": [{c:"PBT",s:S.grey}],
+  "Sewerage":       [{c:"IWK",s:S.amber},{c:"SPAN",s:S.grey}],
+  "Water Supply":   [{c:"Air Slgr",s:S.orange},{c:"SPAN",s:S.grey}],
+  "Power":          [{c:"TNB",s:S.grey}],
+  "Telekom":        [{c:"TM",s:S.grey},{c:"SKMM (MCMC)",s:S.grey}]
 };
 
 /* ---- LOCAL INFRA ---- */
@@ -448,9 +448,9 @@ const LINFRA = {
 
 /* ---- department clearance sample sets ---- */
 const DEPTS_KM = [
-  {c:"OSC",s:S.green},{c:"JPP",s:S.green},{c:"JKB",s:S.amber},{c:"JPS",s:S.green},
-  {c:"JMG",s:S.red},{c:"JKR",s:S.amber},{c:"IWK",s:S.grey},{c:"TNB",s:S.green},
-  {c:"Air Slgr",s:S.grey},{c:"SKMM",s:S.grey}
+  {c:"OSC",s:S.green},{c:"JKR",s:S.green},{c:"JPS",s:S.green},{c:"IWK",s:S.amber},
+  {c:"Water (AiS)",s:S.amber},{c:"TNB",s:S.green},{c:"Telco/SKMM",s:S.grey},
+  {c:"JMG",s:S.red},{c:"Land (PTD)",s:S.grey}
 ];
 const DEPTS_INFRA = [
   {c:"JPS",s:S.green},{c:"IWK",s:S.amber},{c:"Air Slgr",s:S.orange},{c:"TNB",s:S.grey},
@@ -594,8 +594,12 @@ function renderDrill(d){
   // side: dept grid if any + doc/status
   let side='';
   if(m.depts){
-    const set = m.depts==='km'?DEPTS_KM:DEPTS_INFRA;
-    side += `<div style="font-size:11px;font-weight:700;margin-bottom:8px">Department Clearance
+    let set, heading;
+    if(m.depts==='trait'){ set = TRAIT_AUTH[d.traits[currentTrait]]||DEPTS_INFRA;
+      heading = d.traits[currentTrait]+" — Authority Clearance"; }
+    else if(m.depts==='km'){ set = DEPTS_KM; heading = "Agency Clearance (G1–G8 gate)"; }
+    else { set = DEPTS_INFRA; heading = "Department Clearance"; }
+    side += `<div style="font-size:11px;font-weight:700;margin-bottom:8px">${heading}
       <span class="muted" style="font-weight:400">(dot-status per authority)</span></div>
       <div class="dept-grid">`+ set.map(x=>
         `<div class="dept ${x.s}" title="${statusLabel[x.s]}">${x.c}<small>${statusLabel[x.s].split(' ')[0]}</small></div>`).join('')+`</div>`;
@@ -637,6 +641,38 @@ document.querySelectorAll('#subTabs .tab[data-dash]').forEach(t=>t.onclick=()=>{
 
 buildProjTree();
 render();
+</script>
+
+<!-- ===== PASSCODE GATE ===== -->
+<style>
+#gate{position:fixed;inset:0;z-index:9999;background:#0f172a;display:grid;place-items:center;font-family:"Segoe UI",Roboto,Arial,sans-serif}
+#gate .box{background:#fff;border-radius:14px;padding:28px 30px;width:320px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+#gate h3{margin:0 0 4px;font-size:17px;color:#1f2937}
+#gate p{margin:0 0 16px;font-size:12px;color:#6b7280}
+#gate input{width:100%;padding:11px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;text-align:center;letter-spacing:2px}
+#gate button{margin-top:12px;width:100%;padding:11px;border:none;border-radius:8px;background:#1d4ed8;color:#fff;font-size:14px;font-weight:600}
+#gate .err{color:#dc2626;font-size:11.5px;height:14px;margin-top:8px}
+</style>
+<div id="gate">
+  <div class="box">
+    <h3>PPD Digitalization Dashboard</h3>
+    <p>Enter passcode to view</p>
+    <input id="gateInput" type="password" placeholder="••••••" autocomplete="off"
+      onkeydown="if(event.key==='Enter')checkGate()">
+    <button onclick="checkGate()">Enter</button>
+    <div class="err" id="gateErr"></div>
+  </div>
+</div>
+<script>
+/* Change PASSCODE to whatever you like. Note: this is a light gate to deter
+   casual access — a determined viewer can read it in the page source. */
+const PASSCODE = "ppd2026";
+function checkGate(){
+  const v=document.getElementById('gateInput').value;
+  if(v===PASSCODE){document.getElementById('gate').style.display='none';}
+  else{document.getElementById('gateErr').textContent='Incorrect passcode';}
+}
+document.getElementById('gateInput').focus();
 </script>
 </body>
 </html>
