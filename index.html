@@ -142,6 +142,44 @@ button{font-family:inherit;cursor:pointer}
 .hidden{display:none}
 .ping{margin-left:8px;font-size:10px;font-weight:700;color:#fff;background:var(--orange);border:none;border-radius:6px;padding:4px 9px}
 .footer-note{font-size:10px;color:var(--muted);text-align:center;padding:14px}
+
+/* masterplan confirmation — custom interactive step flow */
+.mc-step{border:1px solid var(--line);border-radius:9px;padding:11px 13px;margin-bottom:10px;background:#fbfcfe}
+.mc-step.mc-accent{border-color:#c7d6f5;background:#f5f8ff}
+.mc-step .mc-n{font-size:11.5px;font-weight:800;color:var(--blue);margin-bottom:8px;letter-spacing:.02em}
+.mc-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.mc-row:last-child{margin-bottom:0}
+.mc-attendees{display:flex;gap:4px;flex-wrap:wrap;margin-left:2px}
+.mc-att{font-size:9px;font-weight:700;color:#4b5563;background:#eef2f7;border-radius:20px;padding:2px 7px}
+.mc-link{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--blue);border:1px dashed var(--blue);
+  border-radius:6px;padding:6px 11px;cursor:pointer;background:var(--blue-soft);font-weight:600}
+.mc-link.done{color:#146c39;border:1px solid var(--green);background:var(--green-soft)}
+.mc-date{font-size:11.5px;border:1px solid var(--line);border-radius:6px;padding:6px 11px;cursor:pointer;background:#fff;
+  min-width:96px;text-align:center;font-weight:600;color:#374151}
+.mc-date.set{border-color:var(--blue);color:var(--blue);background:var(--blue-soft)}
+.mc-outlook{font-size:10.5px;color:var(--blue);text-decoration:underline;cursor:pointer;font-weight:600}
+.mc-btn{font-size:10px;font-weight:700;border:none;border-radius:6px;padding:6px 10px;cursor:pointer}
+.mc-btn.submit{background:var(--blue);color:#fff}
+.mc-btn.go{background:var(--green);color:#fff}
+.mc-btn.warn{background:#fff;border:1px solid var(--orange);color:var(--orange)}
+.mc-btn.ghost{background:#fff;border:1px solid var(--line);color:#4b5563}
+.mc-pill-toggle{display:inline-flex;border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.mc-pill-toggle span{font-size:10px;font-weight:700;padding:5px 10px;cursor:pointer;color:#4b5563}
+.mc-pill-toggle span.active.feasible{background:var(--green);color:#fff}
+.mc-pill-toggle span.active.notfeasible{background:var(--red);color:#fff}
+.mc-note{font-size:10.5px;color:var(--muted);margin-top:6px;line-height:1.45}
+.mc-comment{font-size:11px;color:#374151;background:#f8fafc;border:1px solid #eef2f6;border-radius:6px;padding:7px 9px;margin-top:6px}
+.mc-success{font-size:12px;font-weight:700;color:#146c39;background:var(--green-soft);border:1px solid var(--green);
+  border-radius:8px;padding:10px 12px;margin-top:4px}
+.mc-cal-pop{position:fixed;z-index:50;background:#20242c;color:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.3);padding:10px;width:220px;font-size:11px}
+.mc-cal-pop .cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;font-weight:700}
+.mc-cal-pop .cal-nav{cursor:pointer;padding:0 6px;user-select:none}
+.mc-cal-pop .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}
+.mc-cal-pop .cal-dow{color:#9aa3af;font-size:9.5px;padding:3px 0}
+.mc-cal-pop .cal-day{padding:4px 0;border-radius:5px;cursor:pointer}
+.mc-cal-pop .cal-day:hover{background:#374151}
+.mc-cal-pop .cal-day.other{color:#5b6472;cursor:default}
+.mc-cal-pop .cal-day.other:hover{background:transparent}
 </style>
 </head>
 <body>
@@ -280,9 +318,9 @@ const AP_TARGET = new Date('2027-09-05');
 const TODAY = new Date('2026-08-01');
 function daysLeft(){return Math.round((AP_TARGET-TODAY)/86400000);}
 
-const projects = ["Utopia East","Esplanad Square","Utopia South","Wellington Garden Home",
+const projects = ["Eco Business Park 7","Utopia East","Esplanad Square","Utopia South","Wellington Garden Home",
   "Wellington Terrace Home","Norton Garden Home","Norton Courtyard Home","Sterling West"];
-let currentProj = "Utopia South";
+let currentProj = "Eco Business Park 7";
 
 const S = {green:"st-green",amber:"st-amber",orange:"st-orange",red:"st-red",grey:"st-grey",appeal:"st-appeal"};
 const statusLabel = {"st-green":"Completed","st-amber":"In progress / Ulasan","st-orange":"Submitted & pending",
@@ -299,11 +337,15 @@ const MKM = {
     {cap:"Deliberation & Approval",done:0,total:6}
   ],
   milestones:[
-    {n:1,label:"Setup & Consultant LOA",st:S.green,date:"12 Jan 26",
-      steps:[["TRIGGER: carried over from Stage B — Masterplan cleared by CEO for submission","ppd"],
-        ["PPD-HOD confirms appointment / LOA of submitting consultants from Consultant Management","ppd"],
-        ["System issues LOA; consultants upload acceptance &amp; professional details","auto"]]},
-    {n:2,label:"Pre-Submission Coordination",st:S.green,date:"05 Feb 26",
+    {n:1,label:"Masterplan Confirmation",st:S.green,date:"12 Jan 26",mc:true,
+      steps:[["PPD sets up KM kick-off meeting to brief consultants (Planner, Architect, C&amp;S, M&amp;E)","ppd"],
+        ["PPD uploads meeting minutes; Planner uploads the masterplan cut","ppd"],
+        ["Contract Admin (CA) runs feasibility study on the masterplan cut — internal review","con"],
+        ["Repeat for KM meeting 2 onward until PPD is satisfied the masterplan is feasible","auto"],
+        ["PPD presents the approved masterplan to management for clearance","ppd"],
+        ["Once cleared (with any amendment), PPD informs the consultant of the outcome","ppd"],
+        ["PPD confirms KM approved in system; proceeds to Setup &amp; Consultant LOA","auto"]]},
+    {n:2,label:"Pre-consultation & Upload Doc",st:S.green,date:"05 Feb 26",
       steps:[["PPD-HOD convenes KM pre-submission coordination meeting (Town Planner + sub-consultants)","ppd"],
         ["Town Planner prepares Development Proposal Report (LCP — Laporan Cadangan Pemajuan) &amp; KM set","con"],
         ["PPD confirms SIA &amp; EIA approvals and TIA report are ready to accompany the KM","ppd"]]},
@@ -311,7 +353,7 @@ const MKM = {
       steps:[["GATE: all external technical agency approvals must be in place — JKR, IWK, Water, JPS, TNB, Telco, JMG, Land","ppd"],
         ["System reflects colour status per agency; KM cannot proceed until gate cleared","auto"]],
       depts:"km"},
-    {n:4,label:"OSC 3.0 Plus Online Submission",st:S.orange,date:"01 Apr 26",
+    {n:4,label:"KM Online Submission",st:S.orange,date:"01 Apr 26",
       steps:[["PPD-HOD / PSP makes the OSC ONLINE submission via OSC 3.0 Plus — upload KM set &amp; supporting docs","con"],
         ["OSC vets the online submission (semakan kelengkapan); PSP updates online if any document short","con"],
         ["System auto-ticks checklist as items uploaded; alerts if acknowledgement not uploaded","auto"]],
@@ -322,19 +364,19 @@ const MKM = {
     {n:6,label:"Hardcopy Submission",st:S.grey,date:"—",
       steps:[["PSP submits the HARDCOPY set to the OSC counter (after online approval &amp; fee payment)","con"],
         ["System records OSC submission date / reference no. &amp; tracks statutory processing period","auto"]]},
-    {n:7,label:"OSC Circulation & Query Clearance",st:S.grey,date:"—",
+    {n:7,label:"Clearance (Ext & Int Depts)",st:S.grey,date:"—",
       steps:[["OSC circulates KM to internal departments; PPD / consultants confirm all external agency approvals in","con"],
         ["Consultants upload responses / amended plans for each OSC / agency query","con"],
         ["Repeat until all comments cleared &amp; all agency approvals confirmed","auto"],
         ["PPD-HOD updates management on KM processing status (periodic)","ppd"]]},
-    {n:8,label:"OSC Board Deliberation",st:S.grey,date:"—",
+    {n:8,label:"OSC Meeting",st:S.grey,date:"—",
       steps:[["OSC Technical Committee / Full Board (Mesyuarat JK OSC) deliberates the KM","auto"],
         ["OSC issues decision: (a) Approved; (b) Approved with conditions; (c) Deferred / rejected","auto"]]},
     {n:9,label:"Comply / Appeal",st:S.grey,date:"—",
       steps:[["COMPLY path: consultants amend plans, resubmit for re-deliberation","con"],
         ["APPEAL path: PPD-HOD evaluates &amp; lodges appeal (checks WIKI for similar successful cases)","ppd"],
         ["OSC / Appeal Board re-deliberates; repeat comply-or-appeal until KM approved","auto"]]},
-    {n:10,label:"KM Approval & Charges",st:S.grey,date:"—",
+    {n:10,label:"KM Approval Endorsement",st:S.grey,date:"—",
       steps:[["FEE: PBT issues KM approval (Kebenaran Merancang) with conditions (syarat C1 / C2)","auto"],
         ["Pay KM / development charge (Caj Pemajuan) &amp; any bank guarantee as billed","con"],
         ["Town Planner uploads the KM approval letter &amp; conditions into the system","con"]]},
@@ -578,18 +620,196 @@ function renderTimeline(d){
 
 function tagFor(t){return{auto:['AUTO','tag-auto'],ppd:['PPD','tag-ppd'],con:['CONSULTANT','tag-con'],sm:['SM/HOD','tag-sm']}[t]||['','']; }
 
+/* ---- Masterplan Confirmation (MKM milestone 1) — kick-off / feasibility-review / management-clearance loop ---- */
+const ordinal=n=>['1st','2nd','3rd','4th','5th','6th'][n-1]||(n+'th');
+const mcFlow = {
+  rounds:[
+    {n:1, date:"05 Jan 26", minutes:true, mp:true,
+      ca:{status:'feasible', comment:'Feasible — proceed to 2nd-cut workshop for GDV / product-mix refinement.'}},
+    {n:2, date:"19 Jan 26", minutes:true, mp:true,
+      ca:{status:'feasible', comment:'Feasible — ready for management presentation.'}}
+  ],
+  mgmt:{presented:true, decision:'approved', comment:'Approved as presented (Stage B clearance).'},
+  consultantInformed:true,
+  confirmed:true
+};
+
+let calPopupEl=null;
+function closeCalPopup(){ if(calPopupEl){calPopupEl.remove(); calPopupEl=null;} document.removeEventListener('click',calOutsideClick,true); }
+function calOutsideClick(e){ if(calPopupEl && !calPopupEl.contains(e.target)) closeCalPopup(); }
+function openCalendarPicker(anchor, onPick){
+  closeCalPopup();
+  const pop=document.createElement('div'); pop.className='mc-cal-pop';
+  let view=new Date(2026,7,1);
+  function draw(){
+    const y=view.getFullYear(), mo=view.getMonth();
+    const first=new Date(y,mo,1), startDow=first.getDay();
+    const daysInMonth=new Date(y,mo+1,0).getDate(), daysInPrev=new Date(y,mo,0).getDate();
+    const monthName=view.toLocaleString('en-US',{month:'long'});
+    let cells='';
+    for(let i=0;i<startDow;i++) cells+=`<div class="cal-day other">${daysInPrev-startDow+1+i}</div>`;
+    for(let dd=1; dd<=daysInMonth; dd++) cells+=`<div class="cal-day" data-d="${dd}">${dd}</div>`;
+    const trail=(7-((startDow+daysInMonth)%7))%7;
+    for(let dd=1; dd<=trail; dd++) cells+=`<div class="cal-day other">${dd}</div>`;
+    pop.innerHTML = `<div class="cal-head"><span class="cal-nav" data-nav="-1">&#8249;</span><span>${monthName} ${y}</span><span class="cal-nav" data-nav="1">&#8250;</span></div>
+      <div class="cal-grid">${['Su','Mo','Tu','We','Th','Fr','Sa'].map(x=>`<div class="cal-dow">${x}</div>`).join('')}${cells}</div>`;
+    pop.querySelectorAll('[data-nav]').forEach(b=>b.onclick=e=>{e.stopPropagation(); view=new Date(y,mo+ +b.dataset.nav,1); draw();});
+    pop.querySelectorAll('.cal-day[data-d]').forEach(c=>c.onclick=e=>{
+      e.stopPropagation();
+      const picked=new Date(y,mo,+c.dataset.d);
+      const label=picked.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'2-digit'});
+      closeCalPopup(); onPick(label);
+    });
+  }
+  draw();
+  document.body.appendChild(pop);
+  const r=anchor.getBoundingClientRect();
+  pop.style.top=(r.bottom+6)+'px'; pop.style.left=Math.min(r.left, window.innerWidth-236)+'px';
+  calPopupEl=pop;
+  setTimeout(()=>document.addEventListener('click',calOutsideClick,true),0);
+}
+
+function renderMasterplanConfirm(m){
+  const lastRound = mcFlow.rounds[mcFlow.rounds.length-1];
+  const readyForMgmt = lastRound.ca.status==='feasible' && lastRound.minutes && lastRound.mp;
+
+  const roundsHtml = mcFlow.rounds.map(r=>{
+    const label = ordinal(r.n)+'-cut Masterplan';
+    return `<div class="mc-step">
+      <div class="mc-n">KM Meeting ${r.n} &middot; ${label}</div>
+      <div class="mc-row">
+        <span class="mc-date ${r.date?'set':''}" data-act="cal" data-round="${r.n}">${r.date||'Select date'}</span>
+        <span class="mc-outlook" data-act="outlook" data-round="${r.n}">link to Outlook calendar</span>
+        <span class="mc-attendees"><span class="mc-att">Planner</span><span class="mc-att">Architect</span><span class="mc-att">C&amp;S</span><span class="mc-att">M&amp;E</span></span>
+      </div>
+      <div class="mc-row">
+        <span class="mc-link ${r.minutes?'done':''}" data-act="minutes" data-round="${r.n}">
+          <span class="ic">${r.minutes?'&#10003;':'&#128206;'}</span>${r.minutes?'Minutes uploaded (PPD)':'Link to click (PPD to upload meeting minutes)'}
+        </span>
+        <span class="mc-link ${r.mp?'done':''}" data-act="mp" data-round="${r.n}">
+          <span class="ic">${r.mp?'&#10003;':'&#128206;'}</span>${r.mp?label+' uploaded (Planner)':'Link to click (Planner to upload '+label+')'}
+        </span>
+      </div>
+      <div class="mc-row">
+        <span style="font-size:10.5px;color:var(--muted);font-weight:600">CA feasibility review (internal):</span>
+        <span class="mc-pill-toggle">
+          <span class="${r.ca.status==='feasible'?'active feasible':''}" data-act="ca-feasible" data-round="${r.n}">Feasible</span>
+          <span class="${r.ca.status==='not-feasible'?'active notfeasible':''}" data-act="ca-notfeasible" data-round="${r.n}">Not feasible</span>
+        </span>
+      </div>
+      <div class="mc-comment">${r.ca.comment} <span class="mc-outlook" data-act="ca-comment" data-round="${r.n}" style="margin-left:6px">edit</span></div>
+      ${r.ca.status==='not-feasible' && r.n===lastRound.n ? '<div class="mc-note">Not feasible — loops back for another KM meeting until PPD is satisfied.</div>' : ''}
+    </div>`;
+  }).join('');
+
+  const addRoundBtn = `<div class="mc-row" style="margin:-2px 0 10px">
+    <button class="mc-btn ghost" data-act="add-round">+ Add KM meeting ${mcFlow.rounds.length+1}</button>
+  </div>`;
+
+  let mgmtHtml = `<div class="mc-step mc-accent">
+    <div class="mc-n">Management Presentation &amp; Clearance</div>`;
+  if(!readyForMgmt){
+    mgmtHtml += `<div class="mc-note">Available once PPD marks the latest KM meeting's masterplan cut as <b>Feasible</b> (minutes &amp; masterplan uploaded).</div>`;
+  } else if(!mcFlow.mgmt.presented){
+    mgmtHtml += `<div class="mc-row"><button class="mc-btn submit" data-act="present-mgmt">PPD presents masterplan to management</button></div>`;
+  } else if(!mcFlow.mgmt.decision){
+    mgmtHtml += `<div class="mc-row">
+      <button class="mc-btn go" data-act="mgmt-approve">Management approved</button>
+      <button class="mc-btn warn" data-act="mgmt-amend">Management — amendment requested</button>
+    </div>`;
+  } else {
+    mgmtHtml += `<div class="mc-row"><span class="mc-link done"><span class="ic">&#10003;</span>Management approved</span></div>
+      <div class="mc-comment">${mcFlow.mgmt.comment}</div>`;
+  }
+  mgmtHtml += `</div>`;
+
+  let informHtml='';
+  if(mcFlow.mgmt.decision==='approved'){
+    informHtml = `<div class="mc-step">
+      <div class="mc-n">Inform Consultant of Outcome</div>`;
+    if(!mcFlow.consultantInformed){
+      informHtml += `<div class="mc-row"><button class="mc-btn submit" data-act="notify-consultant">Notify consultant (Planner, Architect, C&amp;S, M&amp;E)</button></div>`;
+    } else {
+      informHtml += `<div class="mc-row"><span class="mc-link done"><span class="ic">&#10003;</span>Consultants notified of management decision</span></div>`;
+    }
+    informHtml += `</div>`;
+  }
+
+  let confirmHtml='';
+  if(mcFlow.consultantInformed){
+    confirmHtml = `<div class="mc-step">
+      <div class="mc-n">Confirm KM in System</div>`;
+    if(!mcFlow.confirmed){
+      confirmHtml += `<div class="mc-row"><button class="mc-btn go" data-act="confirm-km">PPD confirms KM approved &amp; proceeds to next step</button></div>`;
+    } else {
+      confirmHtml += `<div class="mc-success">&#10003; Masterplan confirmed — baseline set, proceeding to Setup &amp; Consultant LOA.</div>`;
+    }
+    confirmHtml += `</div>`;
+  }
+
+  const el=document.getElementById('drillSteps');
+  el.insertAdjacentHTML('beforeend', roundsHtml + addRoundBtn + mgmtHtml + informHtml + confirmHtml);
+
+  el.querySelectorAll('[data-act]').forEach(node=>{
+    const act=node.dataset.act, rn=+node.dataset.round;
+    const round = mcFlow.rounds.find(r=>r.n===rn);
+    node.onclick=(e)=>{
+      switch(act){
+        case 'cal': openCalendarPicker(e.currentTarget, label=>{ round.date=label; renderDrill(MKM); }); break;
+        case 'outlook': alert('Outlook calendar invite generated for KM meeting '+rn+(round.date?' on '+round.date:'')+' and sent to Planner, Architect, C&S, M&E.'); break;
+        case 'minutes': if(!round.minutes){ round.minutes=true; renderDrill(MKM); } break;
+        case 'mp': if(!round.mp){ round.mp=true; renderDrill(MKM); } break;
+        case 'ca-feasible': round.ca.status='feasible'; renderDrill(MKM); break;
+        case 'ca-notfeasible':
+          round.ca.status='not-feasible';
+          if(rn===mcFlow.rounds.length){ mcFlow.rounds.push({n:rn+1,date:null,minutes:false,mp:false,ca:{status:'pending',comment:'Awaiting CA feasibility review.'}}); }
+          mcFlow.mgmt.presented=false; mcFlow.mgmt.decision=null;
+          renderDrill(MKM);
+          break;
+        case 'ca-comment': { const v=prompt('CA feasibility comment:', round.ca.comment); if(v){ round.ca.comment=v; renderDrill(MKM); } break; }
+        case 'add-round':
+          mcFlow.rounds.push({n:mcFlow.rounds.length+1,date:null,minutes:false,mp:false,ca:{status:'pending',comment:'Awaiting CA feasibility review.'}});
+          mcFlow.mgmt.presented=false; mcFlow.mgmt.decision=null;
+          renderDrill(MKM);
+          break;
+        case 'present-mgmt': mcFlow.mgmt.presented=true; renderDrill(MKM); break;
+        case 'mgmt-approve': { const v=prompt('Management comment (optional):','Approved as presented.'); mcFlow.mgmt.decision='approved'; mcFlow.mgmt.comment=v||'Approved.'; renderDrill(MKM); break; }
+        case 'mgmt-amend': {
+          const v=prompt('Amendment requested — comment:','Please revise product mix per management feedback.');
+          mcFlow.mgmt.comment=v||'Amendment requested.'; mcFlow.mgmt.presented=false; mcFlow.mgmt.decision=null;
+          mcFlow.rounds.push({n:mcFlow.rounds.length+1,date:null,minutes:false,mp:false,ca:{status:'pending',comment:'Awaiting CA feasibility review.'}});
+          alert('Consultants (Planner, Architect, C&S, M&E) informed of the requested amendment.');
+          renderDrill(MKM);
+          break;
+        }
+        case 'notify-consultant': mcFlow.consultantInformed=true; alert('Consultants notified: masterplan approved by management.'); renderDrill(MKM); break;
+        case 'confirm-km':
+          mcFlow.confirmed=true; m.st=S.green; m.date=fmtToday();
+          render();
+          break;
+      }
+    };
+  });
+}
+
 function renderDrill(d){
   const m=d.milestones.find(x=>x.n===selMilestone);
   document.getElementById('drillTitle').textContent = `Step ${m.n} · ${m.label.replace(/&amp;/g,'&')}`;
   document.getElementById('drillHint').innerHTML = `Status: <b>${statusLabel[m.st]}</b>${m.date&&m.date!=='—'?' · '+m.date:''}`;
 
   // steps
-  document.getElementById('drillSteps').innerHTML =
-    `<div style="font-size:11px;color:#6b7280;margin-bottom:8px">Actions in this milestone</div>
-     <ol class="steps">`+ m.steps.map(s=>{
-      const [txt,tg]=s; const [lbl,cls]=tagFor(tg);
-      return `<li>${txt}<span class="step-tag ${cls}">${lbl}</span></li>`;
-     }).join('') + `</ol>`;
+  if(d===MKM && m.mc){
+    document.getElementById('drillSteps').innerHTML =
+      `<div style="font-size:11px;color:#6b7280;margin-bottom:8px">Masterplan Confirmation — kick-off, iterative masterplan cuts &amp; internal feasibility review, then management clearance</div>`;
+    renderMasterplanConfirm(m);
+  } else {
+    document.getElementById('drillSteps').innerHTML =
+      `<div style="font-size:11px;color:#6b7280;margin-bottom:8px">Actions in this milestone</div>
+       <ol class="steps">`+ m.steps.map(s=>{
+        const [txt,tg]=s; const [lbl,cls]=tagFor(tg);
+        return `<li>${txt}<span class="step-tag ${cls}">${lbl}</span></li>`;
+       }).join('') + `</ol>`;
+  }
 
   // side: dept grid if any + doc/status
   let side='';
