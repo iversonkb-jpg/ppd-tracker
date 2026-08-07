@@ -1,71 +1,98 @@
-# PPD Digitalization — Submission Management System (SMS) prototype
+# PPD Digitalization Dashboard — project notes
+
+## BASE VERSION (source of truth)
+`index.html` is the **three-dashboard** version — Master KM / Master Infra / Local Infra — confirmed
+by the user (2026) as the base for all future changes. Build on THIS file. Do not reintroduce the
+project-centric / 15-stage register rebuild unless the user explicitly asks.
 
 ## What this is
-An interactive UIUX prototype for the **PPD (Project Planning & Development)** digitalization
-initiative at Eco World, rebuilt to the **SMS specification** (`SMS-Specification.md`). It is a single
-self-contained HTML file (no backend, no build), styled on the PPD "KMBP Works Flow & Suggested
-Interface/Dashboard Concept" deck.
+An interactive UIUX prototype for the PPD (Project Planning & Development) digitalization initiative at
+Eco World. Plain HTML/CSS/JS, no backend, no build step, styled on the PPD "KMBP Works Flow
+& Suggested Interface/Dashboard Concept" deck.
 
 ## Files
-- `index.html` — the app (served by GitHub Pages). **Edit this one.**
-- `PPD-Digitalization-Dashboard.html` — identical copy for local/offline sharing. Keep in sync.
-- `SMS-Specification.md` — the Business/Functional Requirements Spec (source of the in-app Spec tab).
+- `index.html` — app shell (served by GitHub Pages): global `<head>`/sidebar/tabs/panel markup, loads
+  `styles.css` + `data.js` + `app.js`. **Edit this one for markup changes.**
+- `styles.css` — all styles.
+- `data.js` — the data model: `AP_TARGET`/`TODAY`, `projects`/`currentProj`, `S`/`statusLabel`, the three
+  dashboard objects (`MKM`/`MINFRA`/`LINFRA`), `TRAIT_AUTH`, `DEPTS_KM`/`DEPTS_INFRA`, `DASHES`, and the
+  `currentDash`/`currentTrait`/`selMilestone` state vars.
+- `app.js` — all application logic: render pipeline, the three custom milestone-drill modules
+  (`mcFlow`/`renderMasterplanConfirm`, `pcState`/`renderPreConsult`, `kmSubState`/`renderKMOnlineSubmission`),
+  the shared calendar-picker popup, and tab wiring.
+- `PPD-Digitalization-Dashboard.html` — a **separate, fully self-contained single-file bundle** (styles/data/app
+  inlined back into one `<style>`/`<script>`) for local/offline sharing (e.g. email) where a multi-file folder
+  isn't practical. It is NOT a straight `cp` of `index.html` anymore — see "How to make common changes" below.
+- `SMS-Specification.md` — the Business/Functional Requirements Spec (reference only; not embedded in this base).
 - `README.md`.
+
+Cache-busting: `index.html` versions `styles.css`/`data.js`/`app.js` with a `?v=N` query string. Bump it
+when editing any of the three, or browsers may serve a stale cached copy.
 
 ## Live site
 GitHub Pages repo `iversonkb-jpg/ppd-tracker` → https://iversonkb-jpg.github.io/ppd-tracker/
-Update: edit `index.html`, commit to `main`; Pages redeploys in ~1 min.
+Update: edit `index.html`, commit/upload to `main`; Pages redeploys in ~1 min.
 
-## Architecture (single file, plain JS — no framework)
-The app is now **project-centric** per the spec (replaced the earlier fixed Master KM / Master Infra /
-Local Infra dashboards). Everything lives in `index.html`:
+## Architecture (plain JS — no framework)
+Split across `data.js` (data) + `app.js` (logic), rendered into the shell markup in `index.html`. Three
+dashboards selected by the secondary tab row (`#subTabs`):
+- **`MKM`** — Master KM (Kebenaran Merancang via OSC 3.0 Plus), 9 milestones. Three milestones have a
+  fully custom interactive drill-in instead of the generic steps list (flagged on the milestone object,
+  branched in `renderDrill`):
+  - **#1 Masterplan Confirmation** (`mc:true`) → `renderMasterplanConfirm` / `mcFlow` — Step 1 Project
+    Brief (base plan upload + basic project data + studies-to-arrange) gates Step 2, a repeating KM
+    Meeting cycle (kick-off date/minutes/masterplan-cut upload → CA feasibility → PPD approval, looping
+    until approved) → management presentation/clearance → inform consultant → confirm KM in system.
+  - **#2 Pre-consultation & Upload Doc** (`pc:true`) → `renderPreConsult` / `pcState` — per-authority
+    (`PC_INTERNAL`/`PC_EXTERNAL`) pre-consultation record with submission rounds (R0, R1…) and PPD
+    Accept/Reject.
+  - **#3 KM Online Submission** (`kmsub:true`) → `renderKMOnlineSubmission` / `kmSubState` — twin-track
+    (KM/BP) submission-date + acknowledgement + doc upload, auto-forwards to land surveyor once both
+    tracks are complete.
+  Agency gate G1–G8 folded into milestone 3's prerequisite (`depts:"km"` → `DEPTS_KM`).
+- **`MINFRA`** — Master Infra, 8 milestones, trait-aware: 7 traits (Earthwork, Road & Drainage,
+  Streetlighting, Sewerage, Water Supply, Power, Telekom). Authority grid per trait via `TRAIT_AUTH`
+  (milestones with `depts:"trait"`).
+- **`LINFRA`** — Local Infra (agency-level), 7 milestones, 7 traits.
+- Registered in `DASHES = {mkm, minfra, linfra}`.
 
-- **Reference data**: `STAGES` (canonical 15-stage lifecycle), `STAGE_DESC`, `STAGE_OWNER`,
-  `STATUS_COLOR` (19-status model → grey/blue/amber/green/red), `CATS` (13 submission categories),
-  `TEMPLATES` (Township/High-Rise/Landed → category sets), `AUTH_SETS` (per-category authority
-  clearance grids incl. KM's G1–G8 gate), `FEES` (per-category fee/status).
-- **Project tree**: `NODES` self-referencing (`parent`) — Eco Grandeur BU → projects → sub-projects
-  (Utopia East is a container with two precincts). Helpers: `childIds`, `leafIds`, `node`, `isLeaf`.
-- **Deterministic generator**: `submissionsFor(leaf)` builds the register from a hash of leaf+category.
-  KM stage biased to 10–15; infra streams **blocked until KM APPROVED** (BR-14). `statsFor(id)` rolls
-  up descendants for portfolio/container views. `_subCache` memoises.
-- **Views** (`setView`): `portfolio` (BU roll-up cards), `project` (KPIs + Submission Register table,
-  or sub-project cards for containers), `tasks` (My Tasks), `spec` (embedded BRD/FRS).
-- **Submission detail** (`renderSubmission`): click a register row → 15-stage dot-timeline
-  (`renderTimeline`) + stage drill-in (`renderStage`) with purpose/owner, authority-clearance grid,
-  fee line (Stage 7), and the document-folder set (§11). Colours from `COL2ST`/`COL2SB`.
-- **Masterplan Confirmation** (`renderMasterplanConfirm`): KM **Stage 6** drill-in is the Apple-style
-  5-phase accordion collapsing the 23-step Stage-B flow; interactive upload/date/confirm controls with
-  role-gating; P&C lock; repeat-loop badge. Uses `mcState` + `openCalendarPicker`.
-- **Roles & gating**: `#roleSel` (PPD-HOD, PPD-PIC, Planner, Consultant, SM/HOD, CDO/CEO);
-  `OWNER_ROLES`/`canAct`; `STAGE_OWNER` maps each stage to its responsible role.
-- **My Tasks**: `buildTasks()` derives the open-action list from every project's register (the current
-  stage's owner); `myOpenTasks()` filters by role; `renderTasks()` lists them with an Open button that
-  navigates to that submission. Count badge on the tab.
-- **System Spec**: `#specSrc` markdown block rendered by the built-in parser (`mdToHtml`/`renderSpec`).
+Each **milestone** = `{n, label, st (status class), date, steps[[text, actorTag]], depts?}`.
+`actorTag` ∈ `auto|ppd|con|sm` → coloured role chip (`tagFor`). `depts` ∈ `"km"|"trait"|"infra"`
+selects which authority-clearance grid shows in the drill-in.
+
+Status colours (`S`): green/amber/orange/red/grey/appeal → `st-*` classes; labels in `statusLabel`.
+
+**Render pipeline**: `render()` (re-renders on tab/project/trait change) → `renderKPIs`, `gaugeSVG`
+(SVG segment gauges), `renderTraitTabs` (trait pills for infra), `renderTimeline` (dot-timeline;
+click a dot → drill), `renderDrill` (steps + authority grid + sample document checklist), `sampleDocs`.
+Sidebar project list via `buildProjTree` (`projects[]`, `currentProj`). Countdown to `AP_TARGET`.
 
 ## State
-`currentView`, `selNode` (project/BU id), `selSub` (submission id or null), `selStage`, `currentRole`.
+`currentDash` (mkm/minfra/linfra), `currentProj`, `currentTrait`, `selMilestone`.
 
 ## How to make common changes
-- **Add a category** → add to `CATS`, `TEMPLATES`, `AUTH_SETS`, `FEES`.
-- **Add a project / sub-project** → add a node to `NODES` with `parent` + `template` (or `container:true`).
-- **Change stage text/owner** → `STAGE_DESC` / `STAGE_OWNER`.
-- **Change status colours** → `STATUS_COLOR`.
-- **Tune sample spread** → the hash biases in `submissionsFor`.
-- After editing `index.html`, copy it over `PPD-Digitalization-Dashboard.html`.
+- **Change a status colour** → edit the milestone's `st:` value (e.g. `S.green`).
+- **Add / edit a milestone** → edit the object's `milestones[]`; keep `n` sequential.
+- **Change authorities** → `DEPTS_KM` or `TRAIT_AUTH`.
+- **Countdown** → `AP_TARGET` / `TODAY` near the top of `data.js`.
+- **Projects list** (sidebar) → `projects[]`.
+- After editing `data.js`/`app.js`/`styles.css`, bump the `?v=N` on their `<script>`/`<link>` tags in
+  `index.html`, then re-inline the three files into `PPD-Digitalization-Dashboard.html` (it must stay a
+  single standalone file — see "Files" above) to keep it in sync.
+
+## Data status
+Deterministic sample data for demo (Utopia South / Eco Grandeur). Not wired to a live source, auth, or
+persistence.
 
 ## Verification
-No test framework. Verified under jsdom: register = 13 rows (Township), 15-stage timeline, portfolio
-roll-up (5 projects), container nesting (2 precincts, 11-row Landed), KM Stage-6 Masterplan accordion
-(5 phases), Stage-7 fee line, per-role task counts, My Tasks Open→submission navigation, KM gate
-blocking infra, and the Spec tab (sections + tables). Browser screenshotting is blocked by the sandbox
-network allowlist, so jsdom is the check of record.
+No test framework. Verify under jsdom (node + jsdom): milestone counts (KM=9, Infra=8, Local=7),
+7 trait pills on infra dashboards, trait-specific clearance grids, and no runtime errors on tab/trait
+switches. Browser screenshotting is blocked by the sandbox network allowlist, so jsdom is the check of record.
 
-## Known follow-ups / not yet built
-- Deep drill data is illustrative; not wired to a live source, auth, or persistence.
-- Planner / SM-HOD task inboxes are light (those roles mostly act inside KM Stage 6, not as register
-  stage-owners).
-- Reports (§14), notification log (§12), audit-trail view (§9), and fee-reconciliation KPI (§13) are
-  described in the Spec tab but not yet built as interactive screens.
-- Target production build is Microsoft Power Platform (Power Apps + SharePoint + Power Automate).
+## Features NOT in this base (were in a later branch the user reverted away from)
+Masterplan-Confirmation accordion, target-vs-actual slippage indicators, role switcher, My Tasks inbox,
+System Spec tab, and the project-centric 15-stage register. Re-add only if the user asks.
+
+## Tip
+`index.html` was never committed to git in the past, so there was no rollback point. Recommend committing
+to git before large changes so there's always a clean restore point.
